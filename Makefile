@@ -4,7 +4,7 @@
 PGM_NAME = wl2url
 PGM_REL  = 0.3.1
 WORKDIR = work
-FILES = wl2url wl2url.1 Makefile README.txt
+FILES = wl2url.pl wl2url.1 Makefile README.txt
 
 all:
 	@echo Nothing to do
