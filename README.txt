@@ -38,9 +38,14 @@ Usage:
     
 Install:
 
-    Copy wl2url.pl to a directory in your $PATH.  For example:
+    1. Copy wl2url.pl to a directory in your $PATH.  For example:
     
-    $ cp wl2url.pl ~/bin
+        $ cp wl2url.pl ~/bin
+
+    2. Copy wl2url.1 to a man page directory in you $MANPATH.  For
+       example:
+
+        $ cp wl2url.1 ~/man/man1
 
 Supported MacOSX Versions:
 
