@@ -1,15 +1,17 @@
-.\" $Id: wl2url.1 403 2005-12-31 10:12:02Z ranga $
 .TH wl2url 1 
 .SH NAME
-wl2url - a simple utility for converting a webloc file to a url file
+wl2url - a simple utility for converting a .webloc file to a .url file
 .SH SYNOPSIS
 wl2url [-dhnqv] [-o dir] files
 .SH DESCRIPTION
-wl2url is a simple utility for converting MacOS X webloc files into 
-Microsoft internet shortcuts. In webloc files, the url is stored in
-the resource fork, which can only be read on MacOS or MacOS X.  
-Internet shortcuts are plain-text files, which can be read on any 
-platform.
+wl2url is a simple utility for converting MacOSX .webloc files into 
+Microsoft internet shortcuts (.url).  
+
+Historically, .webloc files stored the url is stored in their resource 
+fork, which was generally only accessible on MacOS or MacOSX.  Internet
+shortcuts (.url) are plain-text files, which can be read on any platform.
+
+wl2url relies on DeRez(1) (if available) and falls back to strings(1).
 .SH OPTIONS
 .TP
 .B \-d
@@ -35,6 +37,6 @@ Put the output files in [dir]
 .SH SEE ALSO
 DeRez(1), strings(1)
 .SH PLATFORMS
-wl2url has been tested on MacOS X
+wl2url has been tested on MacOSX 10.4+
 .SH HISTORY
-The wl2url command was written by Sriranga Veeraraghavan <ranga@alum.berkeley.edu>.
+The wl2url command was written by Sriranga Veeraraghavan <ranga@calalum.org>.
