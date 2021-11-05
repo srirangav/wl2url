@@ -21,7 +21,7 @@
 #
 # The url is stored in the c-style comment at the end of the line. 
 #
-# For more information see:
+# For more information see (urls no longer working):
 #
 # http://www.macosxhints.com/article.php?story=20040111200114634&mode=print
 # http://www.macosxhints.com/article.php?story=20040728185233128&mode=print

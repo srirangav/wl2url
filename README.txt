@@ -19,11 +19,6 @@ Overview:
         [InternetShortcut]
         URL=<url>
     
-    For more information see:
-
-        http://www.macosxhints.com/article.php?story=20040111200114634
-        http://www.macosxhints.com/article.php?story=20040728185233128
-
 Usage:
 
     wl2url [-dhnqsv] [-o dir] [files]
