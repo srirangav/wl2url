@@ -1,18 +1,15 @@
 #!/usr/bin/perl -wT
-# wl2url - create .url files from .webloc files
-# $Id: wl2url 400 2005-12-31 08:13:13Z ranga $
+# wl2url - converts MacOSX .webloc files to Microsoft style .url files.
 #
-# wl2url converts MacOS X .webloc files to Microsoft style .url files.
-#
-# MacOS X .webloc files store the url in the resource fork while .url 
-# files are simple text documents with the following format:
+# MacOSX .webloc files historically stored the url in their resource fork 
+# while .url files were simple text documents with the following format:
 #
 # [InternetShortcut]
 # URL=<url>
 #
 # wl2url extracts the url from a .webloc file using DeRez as follows:
 # 
-# /Developer/Tools/DeRez -e [file] -only 'url '
+# $ DeRez -e [file] -only 'url '
 # 
 # The output is similar to the following:
 #
@@ -31,11 +28,14 @@
 #
 # If DeRez is not available, then strings is used instead:
 #
-# /usr/bin/strings [file]/rsrc
+# /usr/bin/strings [file]/..namedfork/rsrc
 #
 # The first line that starts with a ';' contains the url
 #
-# Copyright (c) 2003-2005 Sriranga Veeraraghavan <ranga@alum.berkeley.edu>
+# This tool is probably no longer needed, as modern version of MacOSX have
+# converted .webloc files to an xml format.
+#
+# Copyright (c) 2003-2005, 2021 Sriranga Veeraraghavan <ranga@calalum.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -71,9 +71,12 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 $ENV{'PATH'} = "/bin:/sbin:/usr/bin:/usr/sbin";
 
 my %PGMINFO = ( 'NAME'    => 'wl2url',
-                'VERSION' => '0.3' );
-            
-my $DEREZ="/Developer/Tools/DeRez";
+                'VERSION' => '0.4' );
+
+my @DEREZ_DIRS = ("/Developer/Tools/", "/usr/bin/");
+my $DEREZ_BIN="DeRez";
+my $DEREZ="";
+my $DIR="";
 my $STRINGS="/usr/bin/strings";
 my $FILE = "";
 my $OUTFILE = "";
@@ -86,24 +89,44 @@ my $USESTRINGS = 0;
 my @TMPFILES = ();
 my $OPTSTR = "o:ndqhvs";
 my $OUTDIR = "";
+my $RSRC_PATH = '/..namedfork/rsrc';
+
+# process the command line arguments
 
 if (getopts($OPTSTR, \%OPTS)) {
 
+    # -n - don't create an output file
+
     $NOFILE = 1 if ($OPTS{'n'});
+
+    # -d - delete the webloc file
+
     $DELFILE = 1 if ($OPTS{'d'});
+
+    # -q - be quiet, no output
+
     $QUIET = 1 if ($OPTS{'q'});
+
+    # -s - don't use DeRez (even if available)
+
     $USESTRINGS = 1 if ($OPTS{'s'});
     
+    # -h - print help and exist
+
     if ($OPTS{'h'}) {
         printUsage();
         exit(0);
     }
+
+    # -v - print version and exist
 
     if ($OPTS{'v'}) {
         printVersion();
         exit(0);
     }
     
+    # -o output directory for files
+
     $OUTDIR = $OPTS{'o'};
     if (defined($OUTDIR)) {
         if (! -d $OUTDIR) {
@@ -122,6 +145,17 @@ if (getopts($OPTSTR, \%OPTS)) {
 if (scalar(@ARGV) < 1) {
     printUsage();
     exit(1);
+}
+
+# if we aren't using strings, try to find DeRez
+
+if ($USESTRINGS != 1) {
+    foreach $DIR (@DEREZ_DIRS) {
+        if (-x "$DIR/$DEREZ_BIN") {
+            $DEREZ="$DIR/$DEREZ_BIN";
+            last;
+        }
+    }
 }
 
 foreach $FILE (@ARGV) {
@@ -165,6 +199,8 @@ sub extractUrl
 {
     my $haveDeRez = 0;
     my $url = "";
+    my $filePath = "";
+    my $xmlformat = 0;
     my @parts = ();
     my $wlf = shift @_;
 
@@ -198,7 +234,10 @@ sub extractUrl
         if ($haveDeRez == 1) {
             exec($DEREZ, '-e', $wlf, '-only', "'url '");
         } else {
-            exec($STRINGS, $wlf . '/rsrc');
+            $filePath = $wlf . $RSRC_PATH;
+            if (-r $filePath) {
+                exec($STRINGS, $wlf . $RSRC_PATH);
+            }
         }
         exit(127);
     } 
@@ -206,8 +245,8 @@ sub extractUrl
     # This is the parent
     #
     # If we have DeRez then look for the url in a c-style
-    # comment. Otherwise use strings and /rsrc to get at
-    # the resource fork
+    # comment. Otherwise use strings to look at the resource 
+    # fork
     
     if ($haveDeRez == 1) {
         while (<FH>) {
@@ -218,6 +257,25 @@ sub extractUrl
         }
     } else {
         while (<FH>) {
+
+            # xml format .webloc
+
+            if (/^TEXT/)
+            {
+                $xmlformat = 1;
+                next;
+            }
+            
+            if ($xmlformat == 1) {
+                next unless (/^9/);
+                chomp();
+                s/^9//;
+                $url = $_;
+                last;
+            }
+
+            # traditional format .webloc file
+
             next unless (/^\;/);
             chomp();
             s/^\;//;

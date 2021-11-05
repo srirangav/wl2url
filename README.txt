@@ -1,8 +1,59 @@
 README
 ------
 
-wl2url.pl
+wl2url.pl v0.4
 By Sriranga Veeraraghavan <ranga@calalum.org>
 
-wl2url converts MacOS X .webloc files to Microsoft style .url files.
+Homepage:
 
+    https://github.com/srirangav/wl2url
+
+Overview:
+
+    wl2url converts MacOS X .webloc files to Microsoft style .url files.
+
+    On MacOSX .webloc files historically stored the url in their resource 
+    fork while .url files were simple text documents with the following 
+    format:
+
+        [InternetShortcut]
+        URL=<url>
+    
+    For more information see:
+
+        http://www.macosxhints.com/article.php?story=20040111200114634
+        http://www.macosxhints.com/article.php?story=20040728185233128
+
+Usage:
+
+    wl2url [-dhnqsv] [-o dir] [files]
+    
+        -d       - delete the webloc file
+        -h       - print help and exit
+        -n       - don't create a .url file
+        -q       - quiet mode, don't print out any messages
+        -s       - use strings (even if DeRez is available)
+        -v       - print version and exit
+        -o [dir] - put the url files in the specific directory
+    
+Install:
+
+    Copy wl2url.pl to a directory in your $PATH.  For example:
+    
+    $ cp wl2url.pl ~/bin
+
+Supported MacOSX Versions:
+
+    MacOSX 10.4+
+
+History:
+
+    v0.4 - update to look for DeRez in /usr/bin and to use the 
+           path suffix "/..namedfork/rsrc" to access the resource
+           fork because accessing the resource fork using the 
+           suffix "/rsrc" was deprecated in MacOSX 10.7 
+    v0.3 - initial GitHub release
+
+License:
+
+    Please see LICENSE.txt
